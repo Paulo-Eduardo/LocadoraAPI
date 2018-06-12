@@ -1,0 +1,8 @@
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\bin\Debug\netcoreapp2.0\LocadoraHost.deps.json
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\bin\Debug\netcoreapp2.0\LocadoraHost.runtimeconfig.json
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\bin\Debug\netcoreapp2.0\LocadoraHost.runtimeconfig.dev.json
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\bin\Debug\netcoreapp2.0\LocadoraHost.dll
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\obj\Debug\netcoreapp2.0\LocadoraHost.csproj.CoreCompileInputs.cache
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\obj\Debug\netcoreapp2.0\LocadoraHost.AssemblyInfoInputs.cache
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\obj\Debug\netcoreapp2.0\LocadoraHost.AssemblyInfo.cs
+C:\Dev\Locadora\app\BackEnd\LocadoraAPI\LocadoraHost\obj\Debug\netcoreapp2.0\LocadoraHost.csprojAssemblyReference.cache
