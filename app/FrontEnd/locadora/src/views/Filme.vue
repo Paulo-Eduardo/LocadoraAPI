@@ -218,7 +218,7 @@ export default {
         },
         removerSelecionados() {
             var listId = []
-
+            debugger;
             function removerElemento(e, i, a){
                 if(e.Remover) {
                     listId.push(e.Id);
