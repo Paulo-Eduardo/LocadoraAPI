@@ -2,6 +2,7 @@
   <div class="filme">
      <div>
         <h3>Gênero</h3>
+        <span v-if="erro"  class="helper-text">{{erro}}</span>
         <table class="striped">
             <thead>
                 <tr>
@@ -87,7 +88,8 @@ export default {
             Ativo: true,
         },
         erroCriarData: null,
-        erroCriarNome: null
+        erroCriarNome: null,
+        erro: null
       }
   },
   methods: {
@@ -99,8 +101,14 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    this.editandoGenero = null;
+                } else
+                    this.erro = "Não foi possível efetuar esta ação"
             });
-            this.editandoGenero = null;
         },
         excluirGenero(genero) {
             fetch(localStorage.link + "/api/Genero", {
@@ -110,18 +118,23 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
-            })            
-            .then(() => {
-                fetch(localStorage.link + "/api/Genero", { 
-                        headers : {
-                            "Authorization" : "Bearer " + localStorage.token 
-                        }
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    this.generos = data;
-                })
-            });
+            }) 
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Genero", { 
+                            headers : {
+                                "Authorization" : "Bearer " + localStorage.token 
+                            }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.generos = data;
+                    })
+                } else
+                    this.erro = "Não foi possível efetuar esta ação"
+            });           
+          
         },
         criarGenero() {
             fetch(localStorage.link + "/api/Genero", {
@@ -152,14 +165,16 @@ export default {
                         this.erroCriarNome = null;
                     })
                 } else {
-                    if(data.ModelState["Genero.DataDeCriacao"])
-                        this.erroCriarData = data.ModelState["Genero.DataDeCriacao"][0];
-                    else
-                        this.erroCriarData = null;
-                    if(data.ModelState["Genero.Nome"])
-                        this.erroCriarNome = data.ModelState["Genero.Nome"][0];
-                    else
-                        this.erroCriarNome = null;
+                    if(data.ModelState) {
+                        if(data.ModelState["Genero.DataDeCriacao"])
+                            this.erroCriarData = data.ModelState["Genero.DataDeCriacao"][0];
+                        else
+                            this.erroCriarData = null;
+                        if(data.ModelState["Genero.Nome"])
+                            this.erroCriarNome = data.ModelState["Genero.Nome"][0];
+                        else
+                            this.erroCriarNome = null;
+                    }
                 }
             })
         },
@@ -189,19 +204,24 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
-            }).then(() =>{
-                fetch(localStorage.link + "/api/Genero", { 
-                    headers : {
-                        "Authorization" : "Bearer " + localStorage.token 
-                    }
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    this.generos = null;
-                    this.generos = data;
-                    this.selecionarTodos = false;
-                })
             })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Genero", { 
+                        headers : {
+                            "Authorization" : "Bearer " + localStorage.token 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.generos = null;
+                        this.generos = data;
+                        this.selecionarTodos = false;
+                    })
+                } else
+                    this.erro = "Não foi possível efetuar esta ação"
+            });
         }
     },
     mounted() {

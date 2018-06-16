@@ -2,6 +2,7 @@
   <div class="filme">
      <div>
         <h3>Filmes</h3>
+        <span v-if="erro"  class="helper-text">{{erro}}</span>
         <table class="striped">
             <thead>
                 <tr>
@@ -101,7 +102,8 @@ export default {
         editandoFilme: null,
         erroCriarData: null,
         erroCriarNome: null,
-        erroCriarGenero: null 
+        erroCriarGenero: null,
+        erro: null
       }
   },
   components: {
@@ -131,25 +133,30 @@ export default {
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
             })
-            .then(() => {
-                fetch(localStorage.link + "/api/Genero", { 
-                        headers : {
-                            "Authorization" : "Bearer " + localStorage.token 
-                        }
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    this.generos = data;
-                    fetch(localStorage.link + "/api/Filme", { 
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Genero", { 
                             headers : {
                                 "Authorization" : "Bearer " + localStorage.token 
                             }
                     })
                     .then(response => response.json())
                     .then((data) => {
-                        this.filmes = data;
+                        this.generos = data;
+                        fetch(localStorage.link + "/api/Filme", { 
+                                headers : {
+                                    "Authorization" : "Bearer " + localStorage.token 
+                                }
+                        })
+                        .then(response => response.json())
+                        .then((data) => {
+                            this.filmes = data;
+                        })
                     })
-                })
+                    this.erro = null;
+                } else
+                    this.erro = "Não foi possível efetuar esta ação"
             });
         },
         criarFilme() {
@@ -190,18 +197,23 @@ export default {
                         })
                     })
                 } else {
-                    if(data.ModelState["filme.DateDeCriacao"])
-                        this.erroCriarData = data.ModelState["filme.DateDeCriacao"][0];
-                    else
-                        this.erroCriarData = null;
-                    if(data.ModelState["filme.Nome"])
-                        this.erroCriarNome = data.ModelState["filme.Nome"][0];
-                    else
-                        this.erroCriarNome = null;
-                    if(data.ModelState["filme.GeneroID"])
-                        this.erroCriarGenero = "Informar genero correto";
-                    else
-                        this.erroCriarGenero = null;
+                    if(data.ModelState) {
+                        if(data.ModelState["filme.DateDeCriacao"])
+                            this.erroCriarData = data.ModelState["filme.DateDeCriacao"][0];
+                        else
+                            this.erroCriarData = null;
+                        if(data.ModelState["filme.Nome"])
+                            this.erroCriarNome = data.ModelState["filme.Nome"][0];
+                        else
+                            this.erroCriarNome = null;
+                        if(data.ModelState["filme.GeneroID"])
+                            this.erroCriarGenero = "Informar genero correto";
+                        else
+                            this.erroCriarGenero = null;
+                    } else {
+                        this.erro = null;
+                    }
+
                 }
             })
         },
@@ -234,19 +246,25 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
-            }).then(() =>{
-                fetch(localStorage.link + "/api/Filme", { 
-                    headers : {
-                        "Authorization" : "Bearer " + localStorage.token 
-                    }
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    this.filmes = null;
-                    this.filmes = data;
-                    this.selecionarTodos = false;
-                })
             })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Filme", { 
+                        headers : {
+                            "Authorization" : "Bearer " + localStorage.token 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.filmes = null;
+                        this.filmes = data;
+                        this.selecionarTodos = false;
+                    })
+                } else {
+                    this.erro = "Não foi possível efetuar esta ação"
+                }
+            });
         }
     },
     mounted() {

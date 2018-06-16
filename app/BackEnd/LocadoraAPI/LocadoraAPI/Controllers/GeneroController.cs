@@ -52,7 +52,7 @@ namespace LocadoraAPI.Controllers
             try
             {
                 GeneroService.Atualizar(Genero);
-                return Ok();
+                return Ok("Sucesso");
             }
             catch (Exception e)
             {
@@ -70,7 +70,7 @@ namespace LocadoraAPI.Controllers
                 {
                     GeneroService.Deletar(item);
                 }
-                return Ok();
+                return Ok("Sucesso");
             }
             catch (Exception e)
             {

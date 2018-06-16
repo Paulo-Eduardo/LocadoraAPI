@@ -2,6 +2,7 @@
   <div class="locacao">
      <div>
         <h3>Locacao</h3>
+        <span v-if="erro"  class="helper-text">{{erro}}</span>
         <table class="striped">
             <thead>
                 <tr>
@@ -163,33 +164,40 @@ export default {
         },
         excluirLocacao(locacao) {
             fetch(localStorage.link + "/api/Locacao", {
-                body: JSON.stringify(locacao),
+                body: JSON.stringify([locacao]),
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
-            })            
-            .then(() => {
-                fetch(localStorage.link + "/api/Locacao", { 
-                        headers : {
-                            "Authorization" : "Bearer " + localStorage.token 
-                        }
-                })
-                .then(response => response.json())
-                .then((data) => {
-                    this.locacoes = data;
-                    fetch(localStorage.link + "/api/Filme", { 
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Locacao", { 
                             headers : {
                                 "Authorization" : "Bearer " + localStorage.token 
                             }
                     })
                     .then(response => response.json())
                     .then((data) => {
-                        this.filmes = data;
+                        this.locacoes = data;
+                        fetch(localStorage.link + "/api/Filme", { 
+                                headers : {
+                                    "Authorization" : "Bearer " + localStorage.token 
+                                }
+                        })
+                        .then(response => response.json())
+                        .then((data) => {
+                            this.filmes = data;
+                        })
                     })
-                })
-            });
+                    this.erro = null;
+                } else {
+                    this.erro = "Não foi possível efetuar esta ação"
+                }
+            });            
+
         },
         excluirNovoFilme(filme) {
             var index = this.novaLocacao.Filmes.indexOf(filme);
