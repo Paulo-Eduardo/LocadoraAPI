@@ -44,4 +44,8 @@
 h1 {
   font-family: Georgia, 'Times New Roman', Times, serif
 }
+
+span {
+  font-size: 20px
+}
 </style>

@@ -93,7 +93,6 @@ export default {
   name: 'home',  
   data() {
       return {
-        generos : null,
         filmes: null,
         locacoes: null,
         novaLocacao: {
@@ -104,7 +103,8 @@ export default {
         novoFilme: null,
         erroCriarCpf: null,
         erroCriarFilmes: null,
-        erroCriarData: null
+        erroCriarData: null,
+        erro: null
       }
   },
   methods: {
@@ -164,7 +164,7 @@ export default {
         },
         excluirLocacao(locacao) {
             fetch(localStorage.link + "/api/Locacao", {
-                body: JSON.stringify([locacao]),
+                body: JSON.stringify(locacao),
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

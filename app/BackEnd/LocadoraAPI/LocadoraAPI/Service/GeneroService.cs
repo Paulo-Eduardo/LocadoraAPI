@@ -1,5 +1,6 @@
 ﻿using LocadoraAPI.Data;
 using LocadoraAPI.Model;
+using System;
 using System.Collections.Generic;
 
 namespace LocadoraAPI.Service
@@ -38,6 +39,12 @@ namespace LocadoraAPI.Service
         public void Deletar(int entity)
         {
             Repo.Delete(entity);
+            Repo.Commit();
+        }
+
+        public void RollBack(int entity)
+        {
+            Repo.Rollback(entity);
             Repo.Commit();
         }
     }

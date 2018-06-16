@@ -20,9 +20,18 @@ namespace LocadoraAPI.Controllers
 
 
         [Authorize]
-        public IEnumerable<Locacao> Get()
+        public IHttpActionResult Get()
         {
-            return LocacaoService.ObterLocacaos();
+            try
+            {
+                var result = LocacaoService.ObterLocacaos();
+                return Ok(result);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+
         }
 
         public Locacao Get(int id)
@@ -53,7 +62,7 @@ namespace LocadoraAPI.Controllers
             try
             {
                 LocacaoService.DeletarLocacao(Locacao);
-                return Ok();
+                return Ok("Sucesso");
             }
             catch (Exception e)
             {

@@ -6,6 +6,9 @@ Aconselho a usar o chocolatey
 ```choco install microsoft-build-tools```
 ```choco install nodejs.install```
 
+Então instale as dependencias do projeto front
+Navegue para app\FrontEnd\locadora e rode ```npm install```
+
 
 Tenha certeza que o comando msbuild e npm esta na variavel de ambiente patch
 

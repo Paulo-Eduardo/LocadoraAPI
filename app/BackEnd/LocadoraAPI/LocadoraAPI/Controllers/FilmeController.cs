@@ -68,10 +68,14 @@ namespace LocadoraAPI.Controllers
                 {
                     FilmeService.Deletar(id);
                 }
-                return Ok();
+                return Ok("Sucesso");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
+                foreach (var id in filmes)
+                {
+                    FilmeService.RollBack(id);
+                }
                 return BadRequest(e.Message);
             }
         }

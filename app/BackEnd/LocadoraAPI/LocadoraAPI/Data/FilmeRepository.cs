@@ -1,4 +1,5 @@
-﻿using LocadoraAPI.Model;
+﻿using System;
+using LocadoraAPI.Model;
 
 namespace LocadoraAPI.Data
 {

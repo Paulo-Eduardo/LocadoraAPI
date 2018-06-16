@@ -20,6 +20,7 @@ namespace LocadoraAPI
 
         public object GetService(Type serviceType)
         {
+            contexto.Database.CreateIfNotExists();
             if (serviceType == typeof(FilmeController))
                 return new FilmeController(filmeService);
             else if (serviceType == typeof(GeneroController))

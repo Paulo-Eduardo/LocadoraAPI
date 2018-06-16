@@ -74,6 +74,10 @@ namespace LocadoraAPI.Controllers
             }
             catch (Exception e)
             {
+                foreach (var item in Generos)
+                {
+                    GeneroService.RollBack(item);
+                }
                 return BadRequest(e.Message);
             }
         }

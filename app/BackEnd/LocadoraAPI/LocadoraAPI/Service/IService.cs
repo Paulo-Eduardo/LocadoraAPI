@@ -10,5 +10,6 @@ namespace LocadoraAPI.Service
         void Salvar(T entity);
         void Atualizar(T entity);
         void Deletar(int entity);
+        void RollBack(int entity);
     }
 }

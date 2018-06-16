@@ -42,5 +42,11 @@ namespace LocadoraAPI.Service
             Repo.Delete(entity);
             Repo.Commit();
         }
+
+        public void RollBack(int entity)
+        {
+            Repo.Rollback(entity);
+            Repo.Commit();
+        }
     }
 }

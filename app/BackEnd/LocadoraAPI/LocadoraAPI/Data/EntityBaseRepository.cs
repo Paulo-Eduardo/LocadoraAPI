@@ -51,12 +51,19 @@ namespace LocadoraAPI.Data
             {
                 var item = GetSingle(id);
                 context.Entry(item).State = EntityState.Deleted;
+
             }
         }
 
         public virtual void Commit()
         {
             context.SaveChanges();
+        }
+
+        public void Rollback(int entity)
+        {
+            var item = GetSingle(entity);
+            context.Entry(item).State = EntityState.Unchanged;
         }
     }
 }
