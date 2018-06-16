@@ -41,9 +41,7 @@ namespace LocadoraAPI.Tests.Controllers
             {
                 CpfCliente = "08595979979",
                 DataDeCriacao = DateTime.Now,
-            };
-
-
+            };            
 
             //Act
             controller.Post(locacao);

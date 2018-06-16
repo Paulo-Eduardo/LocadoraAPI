@@ -15,6 +15,11 @@ const router =  new Router({
       path: '/login',
       name: 'login',
       component: Login
+    },    
+    {
+      path: '/',
+      name: 'login',
+      component: Login
     },
     {
       path: '/filme',
@@ -36,10 +41,23 @@ const router =  new Router({
 
 router.beforeEach((to, from, next) => {
   if(to.path != '/login') {
-      if(localStorage.token) { 
-          next();
+      if(localStorage.token) {
+        fetch(localStorage.link + "/api/Account", {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization" : "Bearer " + localStorage.token
+          }
+        })
+        .then(function(response) {
+          if(response.status == 401){
+            next('login');
+          }
+          else {
+            next();
+          }
+        });
       } else {
-          next('login');
+        next('login');
       }
   } else {
       next();

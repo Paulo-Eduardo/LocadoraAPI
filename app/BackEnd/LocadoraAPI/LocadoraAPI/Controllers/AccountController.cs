@@ -40,6 +40,12 @@ namespace LocadoraAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        public IHttpActionResult Get()
+        {
+            return Ok();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

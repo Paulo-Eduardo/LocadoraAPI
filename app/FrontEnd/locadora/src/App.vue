@@ -3,7 +3,7 @@
     <div id="nav">
       <router-link to="/locacao">Locação</router-link> |
       <router-link to="/filme">Filmes</router-link> |
-      <router-link to="/genero">Gêneros</router-link> |
+      <router-link to="/genero">Gêneros</router-link>
     </div>
     <div class="title">
       <h1> Locadora Maggioni </h1>
@@ -15,13 +15,6 @@
 </template>
 
 <script>
-export default {
-  created: function () {
-    if(!localStorage.token){
-      router.push({path:"/login"})
-    }
-  }
-}
 </script>
 
 <style>

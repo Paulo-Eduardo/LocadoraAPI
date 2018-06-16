@@ -19,7 +19,7 @@ namespace LocadoraAPI.Controllers
 
 
         [Authorize]
-        public async Task<IEnumerable<Genero>> Get()
+        public IEnumerable<Genero> Get()
         {
             return GeneroService.Obter();
         }
@@ -32,10 +32,13 @@ namespace LocadoraAPI.Controllers
         [Authorize]
         public IHttpActionResult Post(Genero Genero)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 GeneroService.Salvar(Genero);
-                return Ok();
+                return Ok("Sucesso");
             }
             catch (Exception e)
             {
@@ -43,6 +46,7 @@ namespace LocadoraAPI.Controllers
             }
         }
 
+        [Authorize]
         public IHttpActionResult Put(Genero Genero)
         {
             try
@@ -56,11 +60,16 @@ namespace LocadoraAPI.Controllers
             }
         }
 
-        public IHttpActionResult Delete(Genero Genero)
+
+        [Authorize]
+        public IHttpActionResult Delete(int[] Generos)
         {
             try
             {
-                GeneroService.Deletar(Genero);
+                foreach (var item in Generos)
+                {
+                    GeneroService.Deletar(item);
+                }
                 return Ok();
             }
             catch (Exception e)

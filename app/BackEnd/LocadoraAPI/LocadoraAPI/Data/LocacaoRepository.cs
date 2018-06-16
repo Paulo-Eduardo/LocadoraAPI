@@ -16,11 +16,11 @@ namespace LocadoraAPI.Data
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["Contexto"].ConnectionString))
             {
                 var lookup = new Dictionary<int, Locacao>();
-                return db.Query<Locacao, Filme, Locacao>(@"
+                var locacoes = db.Query<Locacao, Filme, Locacao>(@"
                 SELECT l.*, f.*
                 FROM Locacao l
-                INNER JOIN Locacao_Filme lf ON l.Id = lf.Locacao_Id
-                INNER JOIN Filme f ON f.Id = lf.Filme_Id
+                LEFT JOIN Locacao_Filme lf ON l.Id = lf.Locacao_Id
+                LEFT JOIN Filme f ON f.Id = lf.Filme_Id
                 ", (l, f) =>
                 {
                     Locacao locacao;
@@ -33,6 +33,8 @@ namespace LocadoraAPI.Data
                     locacao.Filmes.Add(f);
                     return locacao;
                 }).AsQueryable();
+
+                return lookup.Values;
             }
         }
 
@@ -88,7 +90,7 @@ namespace LocadoraAPI.Data
         {
             using (IDbConnection db = new SqlConnection(ConfigurationManager.ConnectionStrings["Contexto"].ConnectionString))
             {
-                db.Execute("delete from Locacao_Filme where Id = @id", new { id = entity.Id });
+                db.Execute("delete from Locacao_Filme where Locacao_Id = @id", new { id = entity.Id });
                 db.Execute("delete from Locacao where Id = @id", new { id = entity.Id });
             }
         }

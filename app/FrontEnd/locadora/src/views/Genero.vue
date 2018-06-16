@@ -6,6 +6,12 @@
             <thead>
                 <tr>
                     <th width="120px"></th>
+                    <th width="15%">
+                        <label>
+                            <input @change="mudarSelecao(selecionarTodos)" type="checkbox" class="filled-in" v-model="selecionarTodos" />
+                            <span>Selecionar todos</span>
+                        </label>
+                    </th>
                     <th>Nome</th>
                     <th>Data de Criação</th>
                 </tr>
@@ -18,6 +24,12 @@
                     <td v-else>                        
                         <button v-on:click="editandoGenero = genero.Id" class="btn-floating waves-effect waves-light blue"><i  class="material-icons"> edit </i> </button>
                         <button v-on:click="excluirGenero(genero)" class="btn-floating waves-effect waves-light red"><i  class="material-icons"> delete </i> </button>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" class="filled-in" v-model="genero.Remover"/>
+                            <span></span>
+                        </label>
                     </td>
                     <td v-if="editandoGenero === genero.Id">
                        <input type="text" class="validate" v-model="genero.Nome">
@@ -33,14 +45,25 @@
                     </td>
                 </tr>
                 <tr>
+                    <a v-on:click="removerSelecionados()" class="waves-effect waves-light btn"> Remover Selecionados </a>
+                </tr>
+                <tr>
                     <td>
-                        <button v-on:click="criarGenero()" class="btn-floating waves-effect waves-light green"><i  class="material-icons"> add </i> </button>
+                            <button v-on:click="criarGenero()" class="btn-floating waves-effect waves-light green"><i  class="material-icons"> add </i> </button>
                     </td>
                     <td>
-                        <input type="text" class="validate" v-model="novoGenero.Nome">
                     </td>
                     <td>
-                        <input type="text" v-model="novoGenero.DataDeCriacao">
+                        <div class="input-field">
+                            <input type="text" class="validate" v-model="novoGenero.Nome">
+                            <span v-if="erroCriarNome"  class="helper-text">{{erroCriarNome}}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-field">
+                            <input type="text" class="validate" v-model="novoGenero.DataDeCriacao">
+                            <span v-if="erroCriarData"  class="helper-text">{{erroCriarData}}</span>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -55,13 +78,16 @@ export default {
   name: 'home',  
   data() {
       return {
+        selecionarTodos: false,
         generos : null,
         editandoGenero: null,
         novoGenero: {
             Nome: "",
             DataDeCriacao: "",
             Ativo: true,
-        }   
+        },
+        erroCriarData: null,
+        erroCriarNome: null
       }
   },
   methods: {
@@ -78,14 +104,24 @@ export default {
         },
         excluirGenero(genero) {
             fetch(localStorage.link + "/api/Genero", {
-                body: JSON.stringify(genero),
+                body: JSON.stringify([genero.Id]),
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
+            })            
+            .then(() => {
+                fetch(localStorage.link + "/api/Genero", { 
+                        headers : {
+                            "Authorization" : "Bearer " + localStorage.token 
+                        }
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    this.generos = data;
+                })
             });
-            location.reload();
         },
         criarGenero() {
             fetch(localStorage.link + "/api/Genero", {
@@ -95,9 +131,71 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
-            });
-            location.reload();
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Genero", { 
+                            headers : {
+                                "Authorization" : "Bearer " + localStorage.token 
+                            }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.generos = data;
+                    })
+                } else {
+                    if(data.ModelState["Genero.DataDeCriacao"])
+                        this.erroCriarData = data.ModelState["Genero.DataDeCriacao"][0];
+                    else
+                        this.erroCriarData = null;
+                    if(data.ModelState["Genero.Nome"])
+                        this.erroCriarNome = data.ModelState["Genero.Nome"][0];
+                    else
+                        this.erroCriarNome = null;
+                }
+            })
         },
+        mudarSelecao(remover) {
+            function changeRemoverStatus(e, i, a){
+                e.Remover = remover
+            };
+
+            this.generos.forEach(changeRemoverStatus);
+
+        },
+        removerSelecionados() {
+            var listId = []
+
+            function removerElemento(e, i, a){
+                if(e.Remover) {
+                    listId.push(e.Id);
+                }
+            };           
+
+            this.generos.forEach(removerElemento);
+
+            fetch(localStorage.link + "/api/Genero", {
+                body: JSON.stringify(listId),
+                method: "Delete",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization" : "Bearer " + localStorage.token,                    
+                },
+            }).then(() =>{
+                fetch(localStorage.link + "/api/Genero", { 
+                    headers : {
+                        "Authorization" : "Bearer " + localStorage.token 
+                    }
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    this.generos = null;
+                    this.generos = data;
+                    this.selecionarTodos = false;
+                })
+            })
+        }
     },
     mounted() {
         fetch(localStorage.link + "/api/Genero", { 

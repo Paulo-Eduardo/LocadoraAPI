@@ -31,12 +31,15 @@ namespace LocadoraAPI.Controllers
         [Authorize]
         public IHttpActionResult Post(Filme filme)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 FilmeService.Salvar(filme);
-                return Ok();
+                return Ok("Sucesso");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }
@@ -57,11 +60,14 @@ namespace LocadoraAPI.Controllers
         }
 
         [Authorize]
-        public IHttpActionResult Delete(Filme filme)
+        public IHttpActionResult Delete(int[] filmes)
         {
             try
             {
-                FilmeService.Deletar(filme);
+                foreach (var id in filmes)
+                {
+                    FilmeService.Deletar(id);
+                }
                 return Ok();
             }
             catch(Exception e)

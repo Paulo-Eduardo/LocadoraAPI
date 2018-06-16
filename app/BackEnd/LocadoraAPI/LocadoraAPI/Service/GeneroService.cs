@@ -35,7 +35,7 @@ namespace LocadoraAPI.Service
             Repo.Commit();
         }
 
-        public void Deletar(Genero entity)
+        public void Deletar(int entity)
         {
             Repo.Delete(entity);
             Repo.Commit();

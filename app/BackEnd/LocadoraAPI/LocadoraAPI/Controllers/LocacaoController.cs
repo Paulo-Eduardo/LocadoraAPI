@@ -33,10 +33,13 @@ namespace LocadoraAPI.Controllers
         [Authorize]
         public IHttpActionResult Post(Locacao Locacao)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 LocacaoService.SalvarLocacao(Locacao);
-                return Ok();
+                return Ok("Sucesso");
             }
             catch (Exception e)
             {

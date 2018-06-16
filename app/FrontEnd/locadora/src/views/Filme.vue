@@ -6,19 +6,31 @@
             <thead>
                 <tr>
                     <th width="120px"></th>
+                    <th width="15%">
+                        <label>
+                            <input @change="mudarSelecao(selecionarTodos)" type="checkbox" class="filled-in" v-model="selecionarTodos" />
+                            <span>Selecionar todos</span>
+                        </label>
+                    </th>
                     <th>Nome</th>
                     <th>Data de Criação</th>
                     <th>Gênero</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="filme in this.filmes" :key="filme.Id">
-                    <td v-if="editandoFilme === filme.Id">
+                <tr v-for="filme in this.filmes" :key="filme.id">
+                    <td v-if="editandoFilme === filme.id">
                         <button v-on:click="atualizarFilme(filme)" class="btn-floating waves-effect waves-light green"><i  class="material-icons"> save </i> </button>
                     </td>
                     <td v-else>                        
-                        <button v-on:click="editandoFilme = filme.Id" class="btn-floating waves-effect waves-light blue"><i  class="material-icons"> edit </i> </button>
+                        <button v-on:click="editandoFilme = filme.id" class="btn-floating waves-effect waves-light blue"><i  class="material-icons"> edit </i> </button>
                         <button v-on:click="excluirFilme(filme)" class="btn-floating waves-effect waves-light red"><i  class="material-icons"> delete </i> </button>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" class="filled-in" v-model="filme.Remover"/>
+                            <span></span>
+                        </label>
                     </td>
                     <td v-if="editandoFilme === filme.Id">
                        <input type="text" class="validate" v-model="filme.Nome">
@@ -33,28 +45,36 @@
                         {{filme.DateDeCriacao}}
                     </td>
                     <td v-if="editandoFilme === filme.Id">
-                        <select type="text" class="browser-default" v-model="filme.GeneroID">
-                            <option v-for="genero in generos" :key="genero.Id" :value="genero.Id">{{genero.Nome}}</option>
+                        <select type="text" class="browser-default" v-model="filme.generoID">
+                            <option v-for="genero in generos" :key="genero.id" :value="genero.Id">{{genero.Nome}}</option>
                         </select>
                     </td>
                     <td v-else>
-                        {{getGenero(filme.GeneroID)}}
+                        {{getGenero(filme.generoID)}}
                     </td>
                 </tr>
                 <tr>
+                    <a v-on:click="removerSelecionados()" class="waves-effect waves-light btn"> Remover Selecionados </a>
+                </tr>
+                <tr>
+                    <td>
+                    </td>
                     <td>
                         <button v-on:click="criarFilme()" class="btn-floating waves-effect waves-light green"><i  class="material-icons"> add </i> </button>
                     </td>
                     <td>
                         <input type="text" class="validate" v-model="novoFilme.Nome">
+                        <span v-if="erroCriarNome"  class="helper-text">{{erroCriarNome}}</span>
                     </td>
                     <td>
                         <input type="text" v-model="novoFilme.DateDeCriacao" >
+                        <span v-if="erroCriarData"  class="helper-text">{{erroCriarData}}</span>
                     </td>
                     <td>
                         <select type="text" class="browser-default" v-model="novoFilme.GeneroID">
-                            <option v-for="genero in this.generos" :key="genero.Id" :value="genero.Id">{{genero.Nome}}</option>
+                            <option v-for="genero in this.generos" :key="genero.id" :value="genero.Id">{{genero.Nome}}</option>
                         </select>
+                        <span v-if="erroCriarGenero"  class="helper-text">{{erroCriarGenero}}</span>
                     </td>
                 </tr>
             </tbody>
@@ -69,6 +89,7 @@ export default {
   name: 'home',  
   data() {
       return {
+        selecionarTodos: false,  
         filmes : null,
         generos : null,
         novoFilme: {
@@ -77,7 +98,10 @@ export default {
             Ativo : true,
             GeneroID : "",
         },
-        editandoFilme: null        
+        editandoFilme: null,
+        erroCriarData: null,
+        erroCriarNome: null,
+        erroCriarGenero: null 
       }
   },
   components: {
@@ -100,14 +124,33 @@ export default {
         },
         excluirFilme(filme) {
             fetch(localStorage.link + "/api/Filme", {
-                body: JSON.stringify(filme),
+                body: JSON.stringify([filme.Id]),
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
+            })
+            .then(() => {
+                fetch(localStorage.link + "/api/Genero", { 
+                        headers : {
+                            "Authorization" : "Bearer " + localStorage.token 
+                        }
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    this.generos = data;
+                    fetch(localStorage.link + "/api/Filme", { 
+                            headers : {
+                                "Authorization" : "Bearer " + localStorage.token 
+                            }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.filmes = data;
+                    })
+                })
             });
-            location.reload();
         },
         criarFilme() {
             fetch(localStorage.link + "/api/Filme", {
@@ -117,13 +160,90 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
-            });
-            this.editandoFilme = null;
-            location.reload();
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Genero", { 
+                            headers : {
+                                "Authorization" : "Bearer " + localStorage.token 
+                            }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.generos = data;
+                        fetch(localStorage.link + "/api/Filme", { 
+                                headers : {
+                                    "Authorization" : "Bearer " + localStorage.token 
+                                }
+                        })
+                        .then(response => response.json())
+                        .then((data) => {
+                            this.filmes = data;                            
+                            this.novoFilme.Nome = "";
+                            this.novoFilme.DateDeCriacao = "";
+                            this.novoFilme.GeneroID = "";
+                        })
+                    })
+                } else {
+                    if(data.ModelState["filme.DateDeCriacao"])
+                        this.erroCriarData = data.ModelState["filme.DateDeCriacao"][0];
+                    else
+                        this.erroCriarData = null;
+                    if(data.ModelState["filme.Nome"])
+                        this.erroCriarNome = data.ModelState["filme.Nome"][0];
+                    else
+                        this.erroCriarNome = null;
+                    if(data.ModelState["filme.GeneroID"])
+                        this.erroCriarGenero = "Informar genero correto";
+                    else
+                        this.erroCriarGenero = null;
+                }
+            })
         },
         getGenero(generoId){
-            return this.generos.find(element => element.Id == generoId).Nome
+            return this.generos.find(element => element.id == generoId).Nome
         },
+        mudarSelecao(remover) {
+            function changeRemoverStatus(e, i, a){
+                e.Remover = remover
+            };
+
+            this.filmes.forEach(changeRemoverStatus);
+
+        },
+        removerSelecionados() {
+            var listId = []
+
+            function removerElemento(e, i, a){
+                if(e.Remover) {
+                    listId.push(e.Id);
+                }
+            };           
+
+            this.filmes.forEach(removerElemento);
+
+            fetch(localStorage.link + "/api/Filme", {
+                body: JSON.stringify(listId),
+                method: "Delete",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization" : "Bearer " + localStorage.token,                    
+                },
+            }).then(() =>{
+                fetch(localStorage.link + "/api/Filme", { 
+                    headers : {
+                        "Authorization" : "Bearer " + localStorage.token 
+                    }
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    this.filmes = null;
+                    this.filmes = data;
+                    this.selecionarTodos = false;
+                })
+            })
+        }
     },
     mounted() {
         fetch(localStorage.link + "/api/Genero", { 

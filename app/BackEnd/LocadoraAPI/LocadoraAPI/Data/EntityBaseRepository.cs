@@ -39,10 +39,19 @@ namespace LocadoraAPI.Data
             context.Entry(item).CurrentValues.SetValues(entity);
         }
 
-        public virtual void Delete(T entity)
+        public virtual void Delete(int entity)
         {
-            var item = GetSingle(entity.Id);
+            var item = GetSingle(entity);
             context.Entry(item).State = EntityState.Deleted;
+        }
+
+        public virtual void Delete(int[] entityIds)
+        {
+            foreach (var id  in entityIds)
+            {
+                var item = GetSingle(id);
+                context.Entry(item).State = EntityState.Deleted;
+            }
         }
 
         public virtual void Commit()

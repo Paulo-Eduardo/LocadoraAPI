@@ -9,6 +9,6 @@ namespace LocadoraAPI.Service
         T Obter(int id);
         void Salvar(T entity);
         void Atualizar(T entity);
-        void Deletar(T entity);
+        void Deletar(int entity);
     }
 }

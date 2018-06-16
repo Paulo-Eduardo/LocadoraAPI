@@ -10,18 +10,18 @@ namespace LocadoraAPI.Model
     public class UserModel
     {
         [Required]
-        [Display(Name = "User name")]
+        [Display(Name = "Nome de Usuário")]
         public string UserName { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "A {0} precisa ter no minimo {2} caracteres.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Senha")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Confirmar senha")]
+        [Compare("Password", ErrorMessage = "As senhas não coincidem. Tente novamente")]
         public string ConfirmPassword { get; set; }
     }
 }

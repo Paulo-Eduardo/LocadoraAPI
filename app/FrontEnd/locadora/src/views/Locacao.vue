@@ -13,7 +13,7 @@
             <tbody v-for="locacao in this.locacoes" :key="locacao.Id" >
                 <tr>
                     <td>
-                        <button v-on:click="excluirGenero(genero)" class="btn-floating waves-effect waves-light red"><i  class="material-icons"> delete </i> </button>
+                        <button v-on:click="excluirLocacao(locacao)" class="btn-floating waves-effect waves-light red"><i  class="material-icons"> delete </i> </button>
                     </td>
                     <td>
                         {{locacao.CpfCliente}}
@@ -54,9 +54,11 @@
                     </td>
                     <td>
                         <input type="text" class="validate" v-model="novaLocacao.CpfCliente">
+                        <span v-if="erroCriarCpf"  class="helper-text">{{erroCriarCpf}}</span>
                     </td>
                     <td>
                         <input type="text" v-model="novaLocacao.DataDeCriacao">
+                        <span v-if="erroCriarData"  class="helper-text">{{erroCriarData}}</span>
                     </td>
                 </tr>
                 <tr v-for="filme in this.novaLocacao.Filmes" :key="filme.id">
@@ -75,44 +77,10 @@
                             <option></option>
                             <option v-for="filme in this.filmes" :key="filme.Id" :value="filme">{{filme.Nome}}</option>
                         </select>
+                        <span v-if="erroCriarFilmes"  class="helper-text">{{erroCriarFilmes}}</span>
                     </td>
                 </tr>
             </tbody>
-
-            <!-- <tbody>
-                <tr v-for="genero in this.generos" :key="genero.Id">
-                    <td v-if="editandoGenero === genero.Id">
-                        <button v-on:click="atualizarGenero(genero)" class="btn-floating waves-effect waves-light green"><i  class="material-icons"> save </i> </button>
-                    </td>
-                    <td v-else>                        
-                        <button v-on:click="editandoGenero = genero.Id" class="btn-floating waves-effect waves-light blue"><i  class="material-icons"> edit </i> </button>
-                        <button v-on:click="excluirGenero(genero)" class="btn-floating waves-effect waves-light red"><i  class="material-icons"> delete </i> </button>
-                    </td>
-                    <td v-if="editandoGenero === genero.Id">
-                       <input type="text" class="validate" v-model="genero.Nome">
-                    </td>
-                    <td v-else>
-                        {{genero.Nome}}
-                    </td>
-                    <td v-if="editandoGenero === genero.Id">
-                        <input type="text" v-model="genero.DataDeCriacao" >
-                    </td>
-                    <td v-else>
-                        {{genero.DataDeCriacao}}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button v-on:click="criarGenero()" class="btn-floating waves-effect waves-light green"><i  class="material-icons"> add </i> </button>
-                    </td>
-                    <td>
-                        <input type="text" class="validate" v-model="novoGenero.Nome">
-                    </td>
-                    <td>
-                        <input type="text" v-model="novoGenero.DataDeCriacao">
-                    </td>
-                </tr>
-            </tbody> -->
         </table>
     </div>
   </div>
@@ -132,32 +100,13 @@ export default {
             DataDeCriacao: "",
             Filmes: []
         },
-        novoFilme: null
+        novoFilme: null,
+        erroCriarCpf: null,
+        erroCriarFilmes: null,
+        erroCriarData: null
       }
   },
   methods: {
-        atualizarGenero(genero) {
-            fetch(localStorage.link + "/api/Genero", {
-                body: JSON.stringify(genero),
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization" : "Bearer " + localStorage.token,                    
-                },
-            });
-            this.editandoGenero = null;
-        },
-        excluirGenero(genero) {
-            fetch(localStorage.link + "/api/Genero", {
-                body: JSON.stringify(genero),
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization" : "Bearer " + localStorage.token,                    
-                },
-            });
-            location.reload();
-        },
         criarLocacao() {
             fetch(localStorage.link + "/api/Locacao", {
                 body: JSON.stringify(this.novaLocacao),
@@ -166,12 +115,78 @@ export default {
                     "Content-Type": "application/json",
                     "Authorization" : "Bearer " + localStorage.token,                    
                 },
+            })
+            .then(response => response.json())
+            .then((data) => {
+                if(data == "Sucesso"){
+                    fetch(localStorage.link + "/api/Locacao", { 
+                            headers : {
+                                "Authorization" : "Bearer " + localStorage.token 
+                            }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.locacoes = data;
+                        fetch(localStorage.link + "/api/Filme", { 
+                                headers : {
+                                    "Authorization" : "Bearer " + localStorage.token 
+                                }
+                        })
+                        .then(response => response.json())
+                        .then((data) => {
+                            this.filmes = data;
+                        })
+                    })
+                    this.novaLocacao = {
+                    CpfCliente: "",
+                    DataDeCriacao: "",
+                    Filmes: []
+                }
+                } else {
+                    if(data.ModelState["Locacao.CpfCliente"])
+                        this.erroCriarCpf = data.ModelState["Locacao.CpfCliente"][0];
+                    else
+                        this.erroCriarCpf = null;
+                    if(data.ModelState["Locacao.Filmes"])
+                        this.erroCriarFilmes = data.ModelState["Locacao.Filmes"][0];
+                    else
+                        this.erroCriarFilmes = null;
+                    if(data.ModelState["Locacao.DataDeCriacao"])
+                        this.erroCriarData = "Informar data correta";
+                    else
+                        this.erroCriarData = null;
+                }
+            })
+        },
+        excluirLocacao(locacao) {
+            fetch(localStorage.link + "/api/Locacao", {
+                body: JSON.stringify(locacao),
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization" : "Bearer " + localStorage.token,                    
+                },
+            })            
+            .then(() => {
+                fetch(localStorage.link + "/api/Locacao", { 
+                        headers : {
+                            "Authorization" : "Bearer " + localStorage.token 
+                        }
+                })
+                .then(response => response.json())
+                .then((data) => {
+                    this.locacoes = data;
+                    fetch(localStorage.link + "/api/Filme", { 
+                            headers : {
+                                "Authorization" : "Bearer " + localStorage.token 
+                            }
+                    })
+                    .then(response => response.json())
+                    .then((data) => {
+                        this.filmes = data;
+                    })
+                })
             });
-            this.novaLocacao = {
-                CpfCliente: "",
-                DataDeCriacao: "",
-                Filmes: []
-            }
         },
         excluirNovoFilme(filme) {
             var index = this.novaLocacao.Filmes.indexOf(filme);
