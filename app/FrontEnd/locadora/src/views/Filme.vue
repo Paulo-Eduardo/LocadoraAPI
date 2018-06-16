@@ -183,6 +183,10 @@ export default {
                             this.novoFilme.Nome = "";
                             this.novoFilme.DateDeCriacao = "";
                             this.novoFilme.GeneroID = "";
+
+                            this.erroCriarData = null;
+                            this.erroCriarNome = null;
+                            this.erroCriarGenero = null;
                         })
                     })
                 } else {

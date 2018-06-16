@@ -140,8 +140,11 @@ export default {
                     this.novaLocacao = {
                     CpfCliente: "",
                     DataDeCriacao: "",
-                    Filmes: []
-                }
+                    Filmes: [],
+                    };
+                    this.erroCriarCpf = null;
+                    this.erroCriarFilmes = null;
+                    this.erroCriarData = null;
                 } else {
                     if(data.ModelState["Locacao.CpfCliente"])
                         this.erroCriarCpf = data.ModelState["Locacao.CpfCliente"][0];

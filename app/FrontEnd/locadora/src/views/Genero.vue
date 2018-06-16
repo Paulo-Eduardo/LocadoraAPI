@@ -143,6 +143,13 @@ export default {
                     .then(response => response.json())
                     .then((data) => {
                         this.generos = data;
+                        this.novoGenero = {
+                            Nome: "",
+                            DataDeCriacao: "",
+                            Ativo: true,
+                        }
+                        this.erroCriarData = null;
+                        this.erroCriarNome = null;
                     })
                 } else {
                     if(data.ModelState["Genero.DataDeCriacao"])
